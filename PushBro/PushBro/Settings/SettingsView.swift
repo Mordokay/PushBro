@@ -17,6 +17,9 @@ struct SettingsView: View {
     @AppStorage(AppSettings.calibrationJSONKey) private var calibrationJSON = ""
     @AppStorage(AppSettings.userNameKey) private var userName = ""
     @AppStorage(AppSettings.bodyWeightKgKey) private var bodyWeightKg = 0.0
+    @AppStorage(AppSettings.userSexKey) private var userSexRaw = ""
+    @AppStorage(AppSettings.userAgeKey) private var userAge = 0
+    @AppStorage(AppSettings.userHeightCmKey) private var userHeightCm = 0.0
 
     @State private var showTutorial = false
     @State private var showResetConfirmation = false
@@ -71,6 +74,26 @@ struct SettingsView: View {
                             .multilineTextAlignment(.trailing)
                             .textContentType(.givenName)
                     }
+                    Picker("Sex", selection: $userSexRaw) {
+                        Text("Not set").tag("")
+                        ForEach(Sex.allCases) { sex in
+                            Text(sex.label).tag(sex.rawValue)
+                        }
+                    }
+                    LabeledContent("Age") {
+                        TextField("Optional", value: $userAge, format: .number)
+                            .multilineTextAlignment(.trailing)
+                            .keyboardType(.numberPad)
+                            .frame(maxWidth: 80)
+                    }
+                    LabeledContent("Height") {
+                        TextField("Optional", value: $userHeightCm, format: .number.precision(.fractionLength(0)))
+                            .multilineTextAlignment(.trailing)
+                            .keyboardType(.decimalPad)
+                            .frame(maxWidth: 80)
+                        Text("cm")
+                            .foregroundStyle(.secondary)
+                    }
                     LabeledContent("Weight") {
                         TextField("Optional", value: $bodyWeightKg, format: .number.precision(.fractionLength(0...1)))
                             .multilineTextAlignment(.trailing)
@@ -82,7 +105,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Profile")
                 } footer: {
-                    Text("Weight is only used to estimate calories for Apple Health.")
+                    Text("Sex, age, height, and weight are only used to estimate calories for Apple Health.")
                 }
 
                 Section("Daily goal") {

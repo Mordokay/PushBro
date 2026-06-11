@@ -16,13 +16,28 @@ struct OnboardingView: View {
     @AppStorage(AppSettings.voiceCommandsEnabledKey) private var voiceCommandsEnabled = true
     @AppStorage(AppSettings.spokenCountEnabledKey) private var spokenCountEnabled = true
     @AppStorage(AppSettings.healthKitEnabledKey) private var healthKitEnabled = false
+    @AppStorage(AppSettings.userSexKey) private var userSexRaw = ""
+    @AppStorage(AppSettings.userAgeKey) private var userAge = 0
+    @AppStorage(AppSettings.userHeightCmKey) private var userHeightCm = 0.0
 
     @State private var page = 0
     @State private var weightText = ""
-    @State private var usesPounds = Locale.current.measurementSystem != .metric
-    @FocusState private var weightFieldFocused: Bool
+    @State private var ageText = ""
+    @State private var heightCmText = ""
+    @State private var heightFeetText = ""
+    @State private var heightInchesText = ""
+    @State private var usesImperial = Locale.current.measurementSystem != .metric
+    @FocusState private var focusedField: Field?
 
     private let pageCount = 5
+
+    private enum Field {
+        case name
+        case age
+        case height
+        case heightInches
+        case weight
+    }
 
     enum FitnessLevel: String, CaseIterable, Identifiable {
         case beginner = "Beginner"
@@ -67,11 +82,15 @@ struct OnboardingView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
-            .onChange(of: page) { _, _ in
-                weightFieldFocused = false
+            .onChange(of: page) { old, _ in
+                focusedField = nil
+                if old == 2 {
+                    commitBodyInfo()
+                }
             }
 
             Button {
+                focusedField = nil
                 if page < pageCount - 1 {
                     withAnimation { page += 1 }
                 } else {
@@ -89,8 +108,9 @@ struct OnboardingView: View {
     }
 
     private func finish() {
-        commitWeight()
-        Log.app.info("Onboarding finished (name: \(userName.isEmpty ? "skipped" : "set"), goal: \(dailyGoal), weight: \(bodyWeightKg > 0 ? "set" : "skipped"), health: \(healthKitEnabled))")
+        focusedField = nil
+        commitBodyInfo()
+        Log.app.info("Onboarding finished (name: \(userName.isEmpty ? "skipped" : "set"), goal: \(dailyGoal), sex: \(userSexRaw.isEmpty ? "skipped" : userSexRaw), age: \(userAge > 0 ? "set" : "skipped"), height: \(userHeightCm > 0 ? "set" : "skipped"), weight: \(bodyWeightKg > 0 ? "set" : "skipped"), health: \(healthKitEnabled))")
         dismiss()
     }
 
@@ -105,6 +125,7 @@ struct OnboardingView: View {
             TextField("What should we call you?", text: $userName)
                 .textFieldStyle(.roundedBorder)
                 .textContentType(.givenName)
+                .focused($focusedField, equals: .name)
                 .frame(maxWidth: 280)
         }
     }
@@ -151,32 +172,93 @@ struct OnboardingView: View {
 
     private var bodyPage: some View {
         pageLayout(
-            icon: "scalemass.fill",
-            title: "Your weight (optional)",
-            text: "Used only to estimate calories for Apple Health. Skip it and workouts are still saved — just without calories."
+            icon: "person.text.rectangle.fill",
+            title: "About you",
+            text: "All optional — used only to improve the calorie estimates saved to Apple Health."
         ) {
-            HStack {
-                TextField(usesPounds ? "Weight in lb" : "Weight in kg", text: $weightText)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.decimalPad)
-                    .focused($weightFieldFocused)
-                    .frame(maxWidth: 160)
-                Picker("Unit", selection: $usesPounds) {
-                    Text("kg").tag(false)
-                    Text("lb").tag(true)
+            VStack(spacing: 14) {
+                Picker("Sex", selection: $userSexRaw) {
+                    ForEach(Sex.allCases) { sex in
+                        Text(sex.label).tag(sex.rawValue)
+                    }
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 100)
+
+                Picker("Units", selection: $usesImperial) {
+                    Text("Metric").tag(false)
+                    Text("Imperial").tag(true)
+                }
+                .pickerStyle(.segmented)
+
+                HStack {
+                    TextField("Age", text: $ageText)
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.numberPad)
+                        .focused($focusedField, equals: .age)
+                        .frame(maxWidth: 100)
+                    Text("years")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+
+                HStack {
+                    if usesImperial {
+                        TextField("Height", text: $heightFeetText)
+                            .textFieldStyle(.roundedBorder)
+                            .keyboardType(.numberPad)
+                            .focused($focusedField, equals: .height)
+                            .frame(maxWidth: 70)
+                        Text("ft")
+                            .foregroundStyle(.secondary)
+                        TextField("", text: $heightInchesText)
+                            .textFieldStyle(.roundedBorder)
+                            .keyboardType(.numberPad)
+                            .focused($focusedField, equals: .heightInches)
+                            .frame(maxWidth: 60)
+                        Text("in")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        TextField("Height", text: $heightCmText)
+                            .textFieldStyle(.roundedBorder)
+                            .keyboardType(.decimalPad)
+                            .focused($focusedField, equals: .height)
+                            .frame(maxWidth: 100)
+                        Text("cm")
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+
+                HStack {
+                    TextField("Weight", text: $weightText)
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .weight)
+                        .frame(maxWidth: 100)
+                    Text(usesImperial ? "lb" : "kg")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
             }
+            .frame(maxWidth: 280)
         }
         .onAppear {
             if bodyWeightKg > 0 {
-                let display = usesPounds ? bodyWeightKg / 0.45359237 : bodyWeightKg
+                let display = usesImperial ? bodyWeightKg / 0.45359237 : bodyWeightKg
                 weightText = String(format: "%.0f", display)
             }
-        }
-        .onChange(of: page) { old, _ in
-            if old == 2 { commitWeight() }
+            if userAge > 0 {
+                ageText = "\(userAge)"
+            }
+            if userHeightCm > 0 {
+                if usesImperial {
+                    let totalInches = userHeightCm / 2.54
+                    heightFeetText = "\(Int(totalInches / 12))"
+                    heightInchesText = "\(Int(totalInches.truncatingRemainder(dividingBy: 12).rounded()))"
+                } else {
+                    heightCmText = String(format: "%.0f", userHeightCm)
+                }
+            }
         }
     }
 
@@ -215,10 +297,23 @@ struct OnboardingView: View {
 
     // MARK: - Helpers
 
-    private func commitWeight() {
-        let normalized = weightText.replacingOccurrences(of: ",", with: ".")
-        guard let value = Double(normalized), value > 0 else { return }
-        bodyWeightKg = usesPounds ? value * 0.45359237 : value
+    private func commitBodyInfo() {
+        if let value = Double(weightText.replacingOccurrences(of: ",", with: ".")), value > 0 {
+            bodyWeightKg = usesImperial ? value * 0.45359237 : value
+        }
+        if let value = Int(ageText), (5...120).contains(value) {
+            userAge = value
+        }
+        let heightCm: Double? = if usesImperial {
+            Double(heightFeetText).map { feet in
+                (feet * 12 + (Double(heightInchesText) ?? 0)) * 2.54
+            }
+        } else {
+            Double(heightCmText.replacingOccurrences(of: ",", with: "."))
+        }
+        if let heightCm, (100...250).contains(heightCm) {
+            userHeightCm = heightCm
+        }
     }
 
     private func pageLayout(

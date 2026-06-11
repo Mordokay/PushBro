@@ -21,11 +21,26 @@ enum AppSettings {
     static let userNameKey = "userName"
     /// 0 = not provided. Used for Apple Health calorie estimates.
     static let bodyWeightKgKey = "bodyWeightKg"
+    /// Sex.rawValue; empty = not provided.
+    static let userSexKey = "userSex"
+    /// 0 = not provided.
+    static let userAgeKey = "userAge"
+    /// 0 = not provided. Improves calorie estimates (Mifflin-St Jeor).
+    static let userHeightCmKey = "userHeightCm"
 
     static let defaultDailyGoal = 50
     static let defaultRestThreshold = 4.0
     static let defaultDownThreshold = Difficulty.medium.downThreshold
     static let defaultStartTimerSeconds = 5
+}
+
+enum Sex: String, CaseIterable, Identifiable {
+    case male
+    case female
+    case other
+
+    var id: String { rawValue }
+    var label: String { rawValue.capitalized }
 }
 
 /// Named difficulty presets. The settings slider is continuous; these are its landmarks.

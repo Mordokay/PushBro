@@ -57,9 +57,19 @@ final class HealthKitManager {
 
             // With a known body weight, estimate calories from active set
             // time (rests excluded) so Health rings get credit.
-            let weightKg = UserDefaults.standard.double(forKey: AppSettings.bodyWeightKgKey)
+            let defaults = UserDefaults.standard
+            let weightKg = defaults.double(forKey: AppSettings.bodyWeightKgKey)
+            let age = defaults.integer(forKey: AppSettings.userAgeKey)
+            let heightCm = defaults.double(forKey: AppSettings.userHeightCmKey)
+            let sex = Sex(rawValue: defaults.string(forKey: AppSettings.userSexKey) ?? "")
             let activeSeconds = session.sets.reduce(0.0) { $0 + $1.duration }
-            if let kilocalories = Self.estimatedKilocalories(weightKg: weightKg, activeSeconds: activeSeconds) {
+            if let kilocalories = Self.estimatedKilocalories(
+                weightKg: weightKg,
+                activeSeconds: activeSeconds,
+                ageYears: age > 0 ? age : nil,
+                sex: sex,
+                heightCm: heightCm > 0 ? heightCm : nil
+            ) {
                 let sample = HKQuantitySample(
                     type: HKQuantityType(.activeEnergyBurned),
                     quantity: HKQuantity(unit: .kilocalorie(), doubleValue: kilocalories),
@@ -80,10 +90,50 @@ final class HealthKitManager {
         }
     }
 
-    /// Vigorous calisthenics is ~8 METs: kcal = METs × kg × hours.
-    /// Nil when weight is unknown or there was no active time.
-    nonisolated static func estimatedKilocalories(weightKg: Double, activeSeconds: Double) -> Double? {
+    /// Vigorous calisthenics is ~8 METs.
+    private nonisolated static let pushupMETs = 8.0
+
+    /// Energy estimate for the active (set) time of a session.
+    ///
+    /// With age available, uses the Kozey-corrected MET method: the
+    /// individual's resting metabolic rate from Mifflin-St Jeor
+    /// (weight/height/age/sex) scaled by the activity's MET multiple —
+    /// substantially more accurate across ages and sexes than the textbook
+    /// 1 kcal/kg/h assumption. Falls back to the classic MET formula when
+    /// only weight is known, and to a sex-typical height when height is
+    /// missing. Nil when weight is unknown or there was no active time.
+    nonisolated static func estimatedKilocalories(
+        weightKg: Double,
+        activeSeconds: Double,
+        ageYears: Int? = nil,
+        sex: Sex? = nil,
+        heightCm: Double? = nil
+    ) -> Double? {
         guard weightKg > 0, activeSeconds > 0 else { return nil }
-        return 8.0 * weightKg * (activeSeconds / 3600)
+        let hours = activeSeconds / 3600
+
+        guard let ageYears, ageYears > 0 else {
+            // Classic compendium formula: assumes resting rate of 1 kcal/kg/h.
+            return pushupMETs * weightKg * hours
+        }
+
+        let height = heightCm ?? typicalHeightCm(for: sex)
+        let sexConstant: Double = switch sex {
+        case .male: 5
+        case .female: -161
+        case .other, nil: -78 // midpoint of the sex constants
+        }
+        // Mifflin-St Jeor resting metabolic rate, kcal/day.
+        let rmrPerDay = max(500, 10 * weightKg + 6.25 * height - 5 * Double(ageYears) + sexConstant)
+        let restingKcalPerHour = rmrPerDay / 24
+        return pushupMETs * restingKcalPerHour * hours
+    }
+
+    private nonisolated static func typicalHeightCm(for sex: Sex?) -> Double {
+        switch sex {
+        case .male: 175
+        case .female: 162
+        case .other, nil: 168.5
+        }
     }
 }
