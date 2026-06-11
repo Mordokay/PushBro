@@ -106,6 +106,41 @@ struct ModelTests {
         #expect((extreme ?? 0) == 8 * 500.0 / 24)
     }
 
+    @Test func keytelHeartRateEstimate() {
+        // Male, HR 140, 75 kg, 30 y, 10 min:
+        // (−55.0969 + 0.6309×140 + 0.1988×75 + 0.2017×30) / 4.184 = 12.952 kcal/min
+        let male = HealthKitManager.estimatedKilocaloriesFromHeartRate(
+            averageHeartRate: 140, weightKg: 75, ageYears: 30, sex: .male, durationSeconds: 600
+        )
+        let expectedPerMinute = (-55.0969 + 0.6309 * 140 + 0.1988 * 75 + 0.2017 * 30) / 4.184
+        #expect(abs((male ?? 0) - expectedPerMinute * 10) < 0.0001)
+
+        // Female formula differs.
+        let female = HealthKitManager.estimatedKilocaloriesFromHeartRate(
+            averageHeartRate: 140, weightKg: 75, ageYears: 30, sex: .female, durationSeconds: 600
+        )
+        #expect((female ?? 0) < (male ?? 0))
+
+        // Guards: implausible HR, missing age, zero duration.
+        #expect(HealthKitManager.estimatedKilocaloriesFromHeartRate(
+            averageHeartRate: 250, weightKg: 75, ageYears: 30, sex: .male, durationSeconds: 600
+        ) == nil)
+        #expect(HealthKitManager.estimatedKilocaloriesFromHeartRate(
+            averageHeartRate: 140, weightKg: 75, ageYears: nil, sex: .male, durationSeconds: 600
+        ) == nil)
+        #expect(HealthKitManager.estimatedKilocaloriesFromHeartRate(
+            averageHeartRate: 140, weightKg: 75, ageYears: 30, sex: .male, durationSeconds: 0
+        ) == nil)
+    }
+
+    @Test func sessionAverageHeartRate() {
+        let session = WorkoutSession(startDate: .now, endDate: .now, mode: .camera)
+        #expect(session.averageHeartRate == nil)
+        session.heartRateOffsets = [0, 5, 10]
+        session.heartRateValues = [100, 120, 140]
+        #expect(session.averageHeartRate == 120)
+    }
+
     @Test func calibrationProfileJSONRoundTrip() throws {
         let profile = CalibrationProfile(upDistance: 0.45, downDistance: 0.18, createdAt: Date(timeIntervalSince1970: 1_750_000_000))
         let decoded = try #require(CalibrationProfile.decode(fromJSON: profile.encodedJSON()))

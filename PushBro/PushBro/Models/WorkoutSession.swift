@@ -19,6 +19,11 @@ final class WorkoutSession {
     /// Denormalized so calendar queries never fault in sets.
     var totalReps: Int
     var healthKitWorkoutID: UUID?
+    /// Heart rate from a paired watch: seconds since startDate + bpm, parallel arrays.
+    var heartRateOffsets: [Double] = []
+    var heartRateValues: [Double] = []
+    /// Active energy computed by the watch's own sensor fusion, when available.
+    var watchEnergyKcal: Double?
 
     @Relationship(deleteRule: .cascade, inverse: \WorkoutSet.session)
     var sets: [WorkoutSet] = []
@@ -34,6 +39,11 @@ final class WorkoutSession {
 
     var orderedSets: [WorkoutSet] {
         sets.sorted { $0.index < $1.index }
+    }
+
+    var averageHeartRate: Double? {
+        guard !heartRateValues.isEmpty else { return nil }
+        return heartRateValues.reduce(0, +) / Double(heartRateValues.count)
     }
 
     init(startDate: Date, endDate: Date, mode: WorkoutMode, totalReps: Int = 0) {

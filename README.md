@@ -21,6 +21,7 @@ The required rep depth is adjustable in Settings (Easy ≈ 60% of your range, Ha
 - 📅 **History** — calendar heatmap against your daily goal, day drill-down to sessions and sets
 - 📊 **Stats** — totals, best set, best day, longest session, average pace, current & best streak
 - 🍎 **Apple Health** — sessions saved as functional strength workouts
+- ⌚ **Apple Watch** — a companion watch app tracks live heart rate during workouts (an HKWorkoutSession keeps it running with the wrist down), shows reps on the wrist, draws a per-session heart-rate graph over the set timeline, and upgrades calories to watch-computed energy (fallback chain: watch energy → Keytel HR formula → Mifflin-St Jeor → weight-only METs)
 - 🎓 Built-in tutorial (first launch, the `?` button, or Settings)
 
 ## Building

@@ -10,6 +10,7 @@ import SwiftUI
 struct TapCounterView: View {
     let engine: WorkoutEngine
     var voiceHint = false
+    var heartRate: Double?
     let onStop: () -> Void
 
     var body: some View {
@@ -17,6 +18,8 @@ struct TapCounterView: View {
             Text("SET \(engine.setNumber)")
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.secondary)
+
+            ActivityPhaseView(engine: engine)
 
             Text("\(engine.currentSetReps)")
                 .font(.system(size: 180, weight: .black, design: .rounded))
@@ -37,6 +40,15 @@ struct TapCounterView: View {
                         .font(.title3.monospacedDigit())
                         .foregroundStyle(.tertiary)
                 }
+            }
+
+            if let heartRate {
+                Label("\(Int(heartRate)) bpm", systemImage: "heart.fill")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.red)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                    .animation(.snappy, value: Int(heartRate))
             }
 
             Button(role: .destructive, action: onStop) {

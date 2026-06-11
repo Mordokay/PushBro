@@ -20,11 +20,13 @@ struct SettingsView: View {
     @AppStorage(AppSettings.userSexKey) private var userSexRaw = ""
     @AppStorage(AppSettings.userAgeKey) private var userAge = 0
     @AppStorage(AppSettings.userHeightCmKey) private var userHeightCm = 0.0
+    @AppStorage(AppSettings.watchHeartRateEnabledKey) private var watchHeartRateEnabled = true
 
     @State private var showTutorial = false
     @State private var showResetConfirmation = false
     @State private var isDeletingData = false
     @State private var toast: Toast?
+    @FocusState private var profileFieldFocused: Bool
 
     private var calibration: CalibrationProfile? {
         CalibrationProfile.decode(fromJSON: calibrationJSON)
@@ -73,6 +75,7 @@ struct SettingsView: View {
                         TextField("Optional", text: $userName)
                             .multilineTextAlignment(.trailing)
                             .textContentType(.givenName)
+                            .focused($profileFieldFocused)
                     }
                     Picker("Sex", selection: $userSexRaw) {
                         Text("Not set").tag("")
@@ -84,23 +87,30 @@ struct SettingsView: View {
                         TextField("Optional", value: $userAge, format: .number)
                             .multilineTextAlignment(.trailing)
                             .keyboardType(.numberPad)
+                            .focused($profileFieldFocused)
                             .frame(maxWidth: 80)
                     }
                     LabeledContent("Height") {
-                        TextField("Optional", value: $userHeightCm, format: .number.precision(.fractionLength(0)))
-                            .multilineTextAlignment(.trailing)
-                            .keyboardType(.decimalPad)
-                            .frame(maxWidth: 80)
-                        Text("cm")
-                            .foregroundStyle(.secondary)
+                        HStack(spacing: 4) {
+                            TextField("Optional", value: $userHeightCm, format: .number.precision(.fractionLength(0)))
+                                .multilineTextAlignment(.trailing)
+                                .keyboardType(.decimalPad)
+                                .focused($profileFieldFocused)
+                                .frame(maxWidth: 80)
+                            Text("cm")
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     LabeledContent("Weight") {
-                        TextField("Optional", value: $bodyWeightKg, format: .number.precision(.fractionLength(0...1)))
-                            .multilineTextAlignment(.trailing)
-                            .keyboardType(.decimalPad)
-                            .frame(maxWidth: 80)
-                        Text("kg")
-                            .foregroundStyle(.secondary)
+                        HStack(spacing: 4) {
+                            TextField("Optional", value: $bodyWeightKg, format: .number.precision(.fractionLength(0...1)))
+                                .multilineTextAlignment(.trailing)
+                                .keyboardType(.decimalPad)
+                                .focused($profileFieldFocused)
+                                .frame(maxWidth: 80)
+                            Text("kg")
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 } header: {
                     Text("Profile")
@@ -191,12 +201,35 @@ struct SettingsView: View {
                                 }
                             }
                         }
+                    Toggle("Apple Watch heart rate", isOn: $watchHeartRateEnabled)
+                } footer: {
+                    Text("With a paired Apple Watch, workouts track live heart rate for more accurate calories and a per-session heart rate graph.")
                 }
 
                 Section {
                     Button("How PushBro works") {
                         showTutorial = true
                     }
+                }
+
+                Section {
+                    let logFiles = LogFileStore.shared.existingLogFiles
+                    if logFiles.isEmpty {
+                        Text("No logs yet")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ShareLink(items: logFiles) {
+                            Label("Share logs", systemImage: "square.and.arrow.up")
+                        }
+                        Button("Clear logs", role: .destructive) {
+                            LogFileStore.shared.clear()
+                            toast = Toast(text: "Logs cleared")
+                        }
+                    }
+                } header: {
+                    Text("Diagnostics")
+                } footer: {
+                    Text("Detailed app logs (\(ByteCountFormatter.string(fromByteCount: Int64(LogFileStore.shared.totalSizeBytes), countStyle: .file))) — share via AirDrop, Messages, or Mail. Includes events relayed from the watch.")
                 }
 
                 Section {
@@ -220,6 +253,16 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .scrollDismissesKeyboard(.interactively)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        profileFieldFocused = false
+                    }
+                    .font(.body.weight(.semibold))
+                }
+            }
             .toast($toast)
             .fullScreenCover(isPresented: $isDeletingData) {
                 VStack(spacing: 16) {

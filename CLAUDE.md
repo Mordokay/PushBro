@@ -13,7 +13,8 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app xcodebuild \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
 ```
 
-- Targets: `PushBro` (app), `PushBroTests` (unit tests, Swift Testing, hosted in the app).
+- Targets: `PushBro` (app), `PushBroTests` (unit tests, Swift Testing, hosted in the app), `PushBro Watch App` (watchOS companion, embedded via "Embed Watch Content"; its Info.plist lives at `Configs/PushBroWatch-Info.plist` — files named Info.plist inside filesystem-synchronized groups collide with the generated plist).
+- Watch app: `HKWorkoutSession` + `workout-processing` background mode keep it alive during pushups; WCSession relays live HR/reps and the final summary; the watch saves the Health workout itself, so the phone skips its save when a watch session ran (`pendingWatchSession` flow in WorkoutView).
 - The project uses filesystem-synchronized groups: new `.swift` files under `PushBro/PushBro/` are picked up automatically — no pbxproj edits needed for new files.
 - The user runs the GUI from Xcode-beta; if it's open, it may canonicalize pbxproj edits.
 
@@ -30,7 +31,7 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app xcodebuild \
 - Distance providers (preference order in `FaceDistanceProviderFactory`): `TrueDepthDistanceProvider` (raw AVFoundation depth map, 10th-percentile of central region — keep `isFilteringEnabled = false` so below-min-range frames read as nil instead of invented values), `ARFaceDistanceProvider` (ARKit fallback), `SimulatedFaceDistanceProvider` (Simulator).
 - Set splitting is gap-based at rep time (`restThreshold` between reps), not timer-based.
 - Settings are `@AppStorage` with keys centralized in `Models/AppSettings.swift` — never inline string keys.
-- Logging goes through `Support/Log.swift` (`Log.calibration`, `Log.detection`, `Log.workout`, `Log.voice`, `Log.audio`, `Log.health`, `Log.data`, `Log.app`) with emoji levels 🟢 debug · 🔵 info · 🟡 warning · 🔴 error. Log state *transitions*, never per-frame data (samples arrive at 60 Hz).
+- Logging goes through `Shared/Log.swift` (compiled into both the iOS and watch targets; `Log.calibration`, `Log.detection`, `Log.workout`, `Log.voice`, `Log.audio`, `Log.health`, `Log.data`, `Log.watch`, `Log.app`) with emoji levels 🟢 debug · 🔵 info · 🟡 warning · 🔴 error. Every line also appends to a rotating file (`LogFileStore`, ~2 MB + one previous, shareable from Settings → Diagnostics). Log state *transitions*, never per-frame data (samples arrive at 60 Hz). The `Shared/` synced folder is referenced by both app targets — put cross-platform code there.
 
 ## Gotchas learned the hard way
 

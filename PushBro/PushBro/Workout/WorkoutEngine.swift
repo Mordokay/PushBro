@@ -17,6 +17,8 @@ final class WorkoutEngine {
     /// 1-based, for display.
     private(set) var setNumber = 1
     private(set) var sessionStart: Date?
+    /// When the most recent rep landed — drives the active/rest indicator.
+    private(set) var lastRepAt: Date?
     /// The persisted session shown by the summary screen.
     private(set) var finishedSession: WorkoutSession?
 
@@ -105,6 +107,7 @@ final class WorkoutEngine {
 
         currentSetReps += 1
         totalReps += 1
+        lastRepAt = date
         announcer?.speak("\(currentSetReps)")
     }
 
@@ -159,6 +162,7 @@ final class WorkoutEngine {
         totalReps = 0
         setNumber = 1
         sessionStart = nil
+        lastRepAt = nil
         openSet = nil
         closedSets = []
         finishedSession = nil

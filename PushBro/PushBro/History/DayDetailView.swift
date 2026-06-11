@@ -3,6 +3,7 @@
 //  PushBro
 //
 
+import Charts
 import SwiftData
 import SwiftUI
 
@@ -21,6 +22,12 @@ struct DayDetailView: View {
                         SessionTimelineView(session: session)
                             .padding(.vertical, 4)
                             .listRowSeparator(.hidden)
+                        if !session.heartRateValues.isEmpty {
+                            HeartRateChartView(session: session)
+                                .frame(height: 130)
+                                .padding(.vertical, 4)
+                                .listRowSeparator(.hidden)
+                        }
                         setRows(for: session)
                     } label: {
                         HStack {
@@ -104,6 +111,45 @@ struct DayDetailView: View {
 
     private func formatted(_ interval: TimeInterval) -> String {
         Duration.seconds(max(0, interval)).formatted(.time(pattern: .minuteSecond))
+    }
+}
+
+/// Heart rate over the session, with the sets shaded underneath so the
+/// effort/recovery rhythm lines up with the workout structure.
+struct HeartRateChartView: View {
+    let session: WorkoutSession
+
+    var body: some View {
+        let points = Array(zip(session.heartRateOffsets, session.heartRateValues))
+        Chart {
+            ForEach(session.orderedSets, id: \.persistentModelID) { set in
+                RectangleMark(
+                    xStart: .value("Start", set.startDate.timeIntervalSince(session.startDate)),
+                    xEnd: .value("End", max(set.endDate.timeIntervalSince(session.startDate), set.startDate.timeIntervalSince(session.startDate) + 2))
+                )
+                .foregroundStyle(Color.accentColor.opacity(0.12))
+            }
+            ForEach(Array(points.enumerated()), id: \.offset) { _, point in
+                LineMark(
+                    x: .value("Time", point.0),
+                    y: .value("BPM", point.1)
+                )
+                .interpolationMethod(.catmullRom)
+                .foregroundStyle(.red)
+            }
+        }
+        .chartYScale(domain: .automatic(includesZero: false))
+        .chartXAxis {
+            AxisMarks { value in
+                AxisGridLine()
+                AxisValueLabel {
+                    if let seconds = value.as(Double.self) {
+                        Text(Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond)))
+                    }
+                }
+            }
+        }
+        .chartYAxisLabel("bpm")
     }
 }
 

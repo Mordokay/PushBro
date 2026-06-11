@@ -55,21 +55,32 @@ final class HealthKitManager {
                 "PushBroTotalReps": session.totalReps,
             ])
 
-            // With a known body weight, estimate calories from active set
-            // time (rests excluded) so Health rings get credit.
+            // Calorie precision chain: watch sensor fusion > Keytel from
+            // measured heart rate > Mifflin-St Jeor profile > weight-only MET.
             let defaults = UserDefaults.standard
             let weightKg = defaults.double(forKey: AppSettings.bodyWeightKgKey)
             let age = defaults.integer(forKey: AppSettings.userAgeKey)
             let heightCm = defaults.double(forKey: AppSettings.userHeightCmKey)
             let sex = Sex(rawValue: defaults.string(forKey: AppSettings.userSexKey) ?? "")
             let activeSeconds = session.sets.reduce(0.0) { $0 + $1.duration }
-            if let kilocalories = Self.estimatedKilocalories(
+
+            let heartRateEstimate = session.averageHeartRate.flatMap { avgHR in
+                Self.estimatedKilocaloriesFromHeartRate(
+                    averageHeartRate: avgHR,
+                    weightKg: weightKg,
+                    ageYears: age > 0 ? age : nil,
+                    sex: sex,
+                    durationSeconds: session.duration
+                )
+            }
+            let profileEstimate = Self.estimatedKilocalories(
                 weightKg: weightKg,
                 activeSeconds: activeSeconds,
                 ageYears: age > 0 ? age : nil,
                 sex: sex,
                 heightCm: heightCm > 0 ? heightCm : nil
-            ) {
+            )
+            if let kilocalories = session.watchEnergyKcal ?? heartRateEstimate ?? profileEstimate {
                 let sample = HKQuantitySample(
                     type: HKQuantityType(.activeEnergyBurned),
                     quantity: HKQuantity(unit: .kilocalorie(), doubleValue: kilocalories),
@@ -87,6 +98,23 @@ final class HealthKitManager {
         } catch {
             // Authorization denied or store error; keep the local session.
             Log.health.error("Saving workout to Health failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// Launches the watch app with a workout configuration so the user never
+    /// has to touch the watch. Fire-and-forget; WCSession covers the
+    /// already-running case.
+    func launchWatchApp() {
+        guard Self.isAvailable else { return }
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .functionalStrengthTraining
+        configuration.locationType = .indoor
+        store.startWatchApp(with: configuration) { success, error in
+            if let error {
+                Log.health.warning("startWatchApp failed: \(error.localizedDescription)")
+            } else {
+                Log.health.debug("Watch app launch requested (success: \(success))")
+            }
         }
     }
 
@@ -135,5 +163,34 @@ final class HealthKitManager {
         case .female: 162
         case .other, nil: 168.5
         }
+    }
+
+    /// Keytel et al. (2005): energy from measured heart rate — the best
+    /// estimate available without the watch's own calorie computation. Uses
+    /// the whole session duration (HR stays elevated through rests). Nil
+    /// without weight, age, or a plausible heart rate.
+    nonisolated static func estimatedKilocaloriesFromHeartRate(
+        averageHeartRate: Double,
+        weightKg: Double,
+        ageYears: Int?,
+        sex: Sex?,
+        durationSeconds: Double
+    ) -> Double? {
+        guard weightKg > 0, durationSeconds > 0,
+              (40...220).contains(averageHeartRate),
+              let ageYears, ageYears > 0 else { return nil }
+
+        let age = Double(ageYears)
+        let minutes = durationSeconds / 60
+        // kcal/min, per sex (the 4.184 converts kJ to kcal).
+        let male = (-55.0969 + 0.6309 * averageHeartRate + 0.1988 * weightKg + 0.2017 * age) / 4.184
+        let female = (-20.4022 + 0.4472 * averageHeartRate - 0.1263 * weightKg + 0.074 * age) / 4.184
+        let perMinute: Double = switch sex {
+        case .male: male
+        case .female: female
+        case .other, nil: (male + female) / 2
+        }
+        guard perMinute > 0 else { return nil }
+        return perMinute * minutes
     }
 }

@@ -27,6 +27,7 @@ enum AppSettings {
     static let userAgeKey = "userAge"
     /// 0 = not provided. Improves calorie estimates (Mifflin-St Jeor).
     static let userHeightCmKey = "userHeightCm"
+    static let watchHeartRateEnabledKey = "watchHeartRateEnabled"
 
     static let defaultDailyGoal = 50
     static let defaultRestThreshold = 4.0

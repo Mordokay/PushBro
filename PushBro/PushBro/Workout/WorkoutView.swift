@@ -15,6 +15,12 @@ struct WorkoutView: View {
     @State private var cameraController: CameraWorkoutController?
     @State private var voiceListener: VoiceCommandListener?
     @State private var showTutorial = false
+    @State private var watchConnector: PhoneWatchConnector?
+    /// Session waiting for the watch's end-of-workout summary.
+    @State private var pendingWatchSession: WorkoutSession?
+    /// True while the dashboard (root workout content) is frontmost — false
+    /// when another tab is selected or calibration is pushed over it.
+    @State private var isDashboardVisible = false
 
     @AppStorage(AppSettings.startTimerSecondsKey) private var startTimerSeconds = AppSettings.defaultStartTimerSeconds
     @AppStorage(AppSettings.restThresholdKey) private var restThreshold = AppSettings.defaultRestThreshold
@@ -25,6 +31,7 @@ struct WorkoutView: View {
     @AppStorage(AppSettings.preferredModeKey) private var preferredModeRaw = WorkoutMode.camera.rawValue
     @AppStorage(AppSettings.healthKitEnabledKey) private var healthKitEnabled = false
     @AppStorage(AppSettings.userNameKey) private var userName = ""
+    @AppStorage(AppSettings.watchHeartRateEnabledKey) private var watchHeartRateEnabled = true
 
     private let timerChoices = [3, 5, 10]
 
@@ -49,6 +56,14 @@ struct WorkoutView: View {
                     Color.clear
                 }
             }
+            .onAppear {
+                isDashboardVisible = true
+                refreshVoiceListening()
+            }
+            .onDisappear {
+                isDashboardVisible = false
+                refreshVoiceListening()
+            }
             .navigationTitle("PushBro")
             .toolbarVisibility(engine?.phase == .active ? .hidden : .visible, for: .navigationBar)
             .toolbar {
@@ -63,6 +78,9 @@ struct WorkoutView: View {
                 TutorialView()
                     .presentationDetents([.large])
             }
+            .onChange(of: showTutorial) { _, _ in
+                refreshVoiceListening()
+            }
         }
         .onAppear {
             if engine == nil {
@@ -71,6 +89,12 @@ struct WorkoutView: View {
                 engine = WorkoutEngine(announcer: announcer)
             }
             setUpVoiceAndInterruptions()
+            setUpWatch()
+        }
+        .onChange(of: engine?.totalReps) { _, newCount in
+            if let newCount, newCount > 0 {
+                watchConnector?.sendRepCount(newCount)
+            }
         }
         .onChange(of: engine?.phase) { _, newPhase in
             let workingOut: Bool = switch newPhase {
@@ -88,10 +112,31 @@ struct WorkoutView: View {
                 break
             }
 
-            if newPhase == .summary, healthKitEnabled, let session = engine?.finishedSession {
-                Task {
-                    await HealthKitManager.shared.save(session)
+            if newPhase == .summary, let session = engine?.finishedSession {
+                if watchConnector?.isWatchWorkoutRunning == true {
+                    // The watch saves to Health itself; HR and calories
+                    // attach when its summary arrives. If it never does
+                    // (watch app stalled, never launched), fall back so the
+                    // workout still reaches Health.
+                    pendingWatchSession = session
+                    watchConnector?.stopWatchWorkout()
+                    Task {
+                        try? await Task.sleep(for: .seconds(15))
+                        guard pendingWatchSession === session else { return }
+                        Log.workout.warning("Watch summary timed out — saving to Health from the phone")
+                        pendingWatchSession = nil
+                        if healthKitEnabled {
+                            await HealthKitManager.shared.save(session)
+                        }
+                    }
+                } else if healthKitEnabled {
+                    Task {
+                        await HealthKitManager.shared.save(session)
+                    }
                 }
+            }
+            if newPhase == .idle || newPhase == .none {
+                watchConnector?.stopWatchWorkout()
             }
         }
         .onDisappear {
@@ -100,6 +145,47 @@ struct WorkoutView: View {
             cameraController = nil
             voiceListener?.stopListening()
             AudioSessionCoordinator.shared.deactivate()
+        }
+    }
+
+    /// Voice commands listen only while the dashboard itself is frontmost:
+    /// not on other tabs, not under the tutorial sheet, and not while
+    /// calibration is pushed (a stray "start" there would launch an
+    /// invisible workout).
+    private func refreshVoiceListening() {
+        guard let voiceListener else { return }
+        let shouldListen = voiceCommandsEnabled && isDashboardVisible && !showTutorial && voiceListener.isAuthorized
+        if shouldListen {
+            if !voiceListener.isListening {
+                AudioSessionCoordinator.shared.activate(recording: true)
+                voiceListener.startListening()
+            }
+        } else {
+            voiceListener.stopListening()
+        }
+    }
+
+    private func setUpWatch() {
+        guard watchHeartRateEnabled else { return }
+        let connector = PhoneWatchConnector.shared
+        watchConnector = connector
+        connector.onSummary = { summary in
+            guard let session = pendingWatchSession else { return }
+            let start = session.startDate.timeIntervalSince1970
+            let pairs = zip(summary.hrTimes, summary.hrValues).filter { $0.0 >= start }
+            session.heartRateOffsets = pairs.map { $0.0 - start }
+            session.heartRateValues = pairs.map { $0.1 }
+            session.watchEnergyKcal = summary.energyKcal
+            if summary.savedToHealth {
+                session.healthKitWorkoutID = summary.workoutUUID
+            }
+            try? modelContext.save()
+            if healthKitEnabled, !summary.savedToHealth {
+                Task {
+                    await HealthKitManager.shared.save(session)
+                }
+            }
+            pendingWatchSession = nil
         }
     }
 
@@ -115,12 +201,13 @@ struct WorkoutView: View {
                 } else {
                     engine.cancelCountdown()
                 }
-            } else if voiceCommandsEnabled {
-                voiceListener?.startListening()
+            } else {
+                refreshVoiceListening()
             }
         }
 
         guard voiceCommandsEnabled else {
+            voiceListener?.stopListening()
             return
         }
         let listener = voiceListener ?? VoiceCommandListener()
@@ -146,8 +233,7 @@ struct WorkoutView: View {
         }
         Task {
             if await listener.requestAuthorization() {
-                AudioSessionCoordinator.shared.activate(recording: true)
-                listener.startListening()
+                refreshVoiceListening()
             }
         }
     }
@@ -165,12 +251,17 @@ struct WorkoutView: View {
                     engine: engine,
                     controller: cameraController,
                     downThreshold: downThreshold,
-                    voiceHint: voiceListener?.isListening == true
+                    voiceHint: voiceListener?.isListening == true,
+                    heartRate: watchConnector?.liveHeartRate
                 ) {
                     engine.stop(context: modelContext)
                 }
             } else {
-                TapCounterView(engine: engine, voiceHint: voiceListener?.isListening == true) {
+                TapCounterView(
+                    engine: engine,
+                    voiceHint: voiceListener?.isListening == true,
+                    heartRate: watchConnector?.liveHeartRate
+                ) {
                     engine.stop(context: modelContext)
                 }
             }
@@ -273,7 +364,11 @@ struct WorkoutView: View {
         engine.restThreshold = restThreshold
         AudioSessionCoordinator.shared.activate(recording: voiceCommandsEnabled && voiceListener?.isAuthorized == true)
 
-        Log.workout.info("Start requested — mode: \(selectedMode.rawValue), delay: \(startTimerSeconds) s, voice: \(voiceListener?.isListening == true), spoken count: \(spokenCountEnabled)")
+        Log.workout.info("Start requested — mode: \(selectedMode.rawValue), delay: \(startTimerSeconds) s, voice: \(voiceListener?.isListening == true), spoken count: \(spokenCountEnabled), watch: \(watchConnector?.isWatchAvailable == true)")
+
+        if watchHeartRateEnabled {
+            watchConnector?.startWatchWorkout(saveToHealth: healthKitEnabled)
+        }
 
         if selectedMode == .camera, cameraAvailable, let calibration,
            let provider = FaceDistanceProviderFactory.make() {

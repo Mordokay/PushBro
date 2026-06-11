@@ -12,6 +12,7 @@ struct CameraCounterView: View {
     let controller: CameraWorkoutController
     let downThreshold: Double
     var voiceHint = false
+    var heartRate: Double?
     let onStop: () -> Void
 
     var body: some View {
@@ -21,6 +22,8 @@ struct CameraCounterView: View {
             Text("SET \(engine.setNumber)")
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.secondary)
+
+            ActivityPhaseView(engine: engine)
 
             Text("\(engine.currentSetReps)")
                 .font(.system(size: 180, weight: .black, design: .rounded))
@@ -38,6 +41,15 @@ struct CameraCounterView: View {
             DepthBarView(depth: controller.currentDepth, downThreshold: downThreshold)
                 .frame(height: 20)
                 .padding(.horizontal, 32)
+
+            if let heartRate {
+                Label("\(Int(heartRate)) bpm", systemImage: "heart.fill")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.red)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                    .animation(.snappy, value: Int(heartRate))
+            }
 
             Button(role: .destructive, action: onStop) {
                 Label("Stop", systemImage: "stop.fill")
@@ -59,10 +71,7 @@ struct CameraCounterView: View {
 
     private var statusBadge: some View {
         Group {
-            if controller.isResting {
-                Label("Resting", systemImage: "pause.circle.fill")
-                    .foregroundStyle(.orange)
-            } else if controller.isTracking {
+            if controller.isTracking {
                 Label("Tracking", systemImage: "dot.radiowaves.left.and.right")
                     .foregroundStyle(.green)
             } else {

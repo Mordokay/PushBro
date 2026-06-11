@@ -6,7 +6,18 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		23FB07D92FDB32FB000943D2 /* PushBro Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 23FB07D12FDB32FB000943D2 /* PushBro Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		2374822E2FDB64890063B436 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 23FB079F2FDB32FB000943D2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 23FB07D32FDB32FB000943D2;
+			remoteInfo = "PushBro Watch App";
+		};
 		23FB08DC2FDB3CD2000943D2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 23FB079F2FDB32FB000943D2 /* Project object */;
@@ -16,9 +27,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		23FB07D72FDB32FB000943D2 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolder = Product;
+			files = (
+				23FB07D92FDB32FB000943D2 /* PushBro Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		23FB07A72FDB32FB000943D2 /* PushBro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PushBro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		23FB07C12FDB32FB000943D2 /* PushBroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PushBroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		23FB07D12FDB32FB000943D2 /* PushBro Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PushBro Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -30,6 +54,16 @@
 		23FB07C22FDB32FB000943D2 /* PushBroTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PushBroTests;
+			sourceTree = "<group>";
+		};
+		23FB07D22FDB32FB000943D2 /* PushBro Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PushBro Watch App";
+			sourceTree = "<group>";
+		};
+		23FB07E12FDB32FB000943D2 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -45,6 +79,11 @@
 			files = (
 			);
 		};
+		23FB07D52FDB32FB000943D2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -52,6 +91,8 @@
 			isa = PBXGroup;
 			children = (
 				23FB07A92FDB32FB000943D2 /* PushBro */,
+				23FB07E12FDB32FB000943D2 /* Shared */,
+				23FB07D22FDB32FB000943D2 /* PushBro Watch App */,
 				23FB07C22FDB32FB000943D2 /* PushBroTests */,
 				23FB07A82FDB32FB000943D2 /* Products */,
 			);
@@ -62,6 +103,7 @@
 			children = (
 				23FB07A72FDB32FB000943D2 /* PushBro.app */,
 				23FB07C12FDB32FB000943D2 /* PushBroTests.xctest */,
+				23FB07D12FDB32FB000943D2 /* PushBro Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,11 +118,16 @@
 				23FB07A32FDB32FB000943D2 /* Sources */,
 				23FB07A42FDB32FB000943D2 /* Frameworks */,
 				23FB07A52FDB32FB000943D2 /* Resources */,
+				23FB07D72FDB32FB000943D2 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
+			dependencies = (
+				23FB07D82FDB32FB000943D2 /* PBXTargetDependency */,
+			);
 			fileSystemSynchronizedGroups = (
 				23FB07A92FDB32FB000943D2 /* PushBro */,
+				23FB07E12FDB32FB000943D2 /* Shared */,
 			);
 			name = PushBro;
 			productName = PushBro;
@@ -108,6 +155,25 @@
 			productReference = 23FB07C12FDB32FB000943D2 /* PushBroTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		23FB07D32FDB32FB000943D2 /* PushBro Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23FB07DB2FDB32FB000943D2 /* Build configuration list for PBXNativeTarget "PushBro Watch App" */;
+			buildPhases = (
+				23FB07D42FDB32FB000943D2 /* Sources */,
+				23FB07D52FDB32FB000943D2 /* Frameworks */,
+				23FB07D62FDB32FB000943D2 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				23FB07D22FDB32FB000943D2 /* PushBro Watch App */,
+				23FB07E12FDB32FB000943D2 /* Shared */,
+			);
+			name = "PushBro Watch App";
+			productName = "PushBro Watch App";
+			productReference = 23FB07D12FDB32FB000943D2 /* PushBro Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -124,6 +190,9 @@
 					23FB07C32FDB32FB000943D2 = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = 23FB07A62FDB32FB000943D2;
+					};
+					23FB07D32FDB32FB000943D2 = {
+						CreatedOnToolsVersion = 26.6;
 					};
 				};
 			};
@@ -143,6 +212,7 @@
 			targets = (
 				23FB07A62FDB32FB000943D2 /* PushBro */,
 				23FB07C32FDB32FB000943D2 /* PushBroTests */,
+				23FB07D32FDB32FB000943D2 /* PushBro Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -154,6 +224,11 @@
 			);
 		};
 		23FB07C62FDB32FB000943D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		23FB07D62FDB32FB000943D2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -171,6 +246,11 @@
 			files = (
 			);
 		};
+		23FB07D42FDB32FB000943D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -178,6 +258,11 @@
 			isa = PBXTargetDependency;
 			target = 23FB07A62FDB32FB000943D2 /* PushBro */;
 			targetProxy = 23FB08DC2FDB3CD2000943D2 /* PBXContainerItemProxy */;
+		};
+		23FB07D82FDB32FB000943D2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 23FB07D32FDB32FB000943D2 /* PushBro Watch App */;
+			targetProxy = 2374822E2FDB64890063B436 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -421,6 +506,68 @@
 			};
 			name = Release;
 		};
+		23FB07DC2FDB32FB000943D2 /* Debug configuration for PBXNativeTarget "PushBro Watch App" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "PushBro Watch App/PushBroWatch.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configs/PushBroWatch-Info.plist";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "PushBro reads heart rate during workouts.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "PushBro saves your pushup sessions as workouts with heart rate and calories.";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.greenSphereStudios.PushBro;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.greenSphereStudios.PushBro.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		23FB07DD2FDB32FB000943D2 /* Release configuration for PBXNativeTarget "PushBro Watch App" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "PushBro Watch App/PushBroWatch.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configs/PushBroWatch-Info.plist";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "PushBro reads heart rate during workouts.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "PushBro saves your pushup sessions as workouts with heart rate and calories.";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.greenSphereStudios.PushBro;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.greenSphereStudios.PushBro.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -445,6 +592,14 @@
 			buildConfigurations = (
 				23FB07C92FDB32FB000943D2 /* Debug configuration for PBXNativeTarget "PushBroTests" */,
 				23FB07CA2FDB32FB000943D2 /* Release configuration for PBXNativeTarget "PushBroTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		23FB07DB2FDB32FB000943D2 /* Build configuration list for PBXNativeTarget "PushBro Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23FB07DC2FDB32FB000943D2 /* Debug configuration for PBXNativeTarget "PushBro Watch App" */,
+				23FB07DD2FDB32FB000943D2 /* Release configuration for PBXNativeTarget "PushBro Watch App" */,
 			);
 			defaultConfigurationName = Release;
 		};

@@ -16,6 +16,7 @@ struct OnboardingView: View {
     @AppStorage(AppSettings.voiceCommandsEnabledKey) private var voiceCommandsEnabled = true
     @AppStorage(AppSettings.spokenCountEnabledKey) private var spokenCountEnabled = true
     @AppStorage(AppSettings.healthKitEnabledKey) private var healthKitEnabled = false
+    @AppStorage(AppSettings.watchHeartRateEnabledKey) private var watchHeartRateEnabled = true
     @AppStorage(AppSettings.userSexKey) private var userSexRaw = ""
     @AppStorage(AppSettings.userAgeKey) private var userAge = 0
     @AppStorage(AppSettings.userHeightCmKey) private var userHeightCm = 0.0
@@ -282,16 +283,23 @@ struct OnboardingView: View {
             title: "Apple Health",
             text: "Save every session as a strength workout\(bodyWeightKg > 0 || !weightText.isEmpty ? " with estimated calories" : "") so your rings get credit."
         ) {
-            Toggle("Save workouts to Apple Health", isOn: $healthKitEnabled)
-                .frame(maxWidth: 320)
-                .onChange(of: healthKitEnabled) { _, enabled in
-                    guard enabled else { return }
-                    Task {
-                        if await !HealthKitManager.shared.requestAuthorization() {
-                            healthKitEnabled = false
+            VStack(spacing: 12) {
+                Toggle("Save workouts to Apple Health", isOn: $healthKitEnabled)
+                    .onChange(of: healthKitEnabled) { _, enabled in
+                        guard enabled else { return }
+                        Task {
+                            if await !HealthKitManager.shared.requestAuthorization() {
+                                healthKitEnabled = false
+                            }
                         }
                     }
-                }
+                Toggle("Apple Watch heart rate", isOn: $watchHeartRateEnabled)
+                Text("With a paired watch, workouts track live heart rate for the most accurate calories — and a heart rate graph on every session.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: 320)
         }
     }
 
