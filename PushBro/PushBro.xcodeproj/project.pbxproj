@@ -1,0 +1,455 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		23FB08DC2FDB3CD2000943D2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 23FB079F2FDB32FB000943D2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 23FB07A62FDB32FB000943D2;
+			remoteInfo = PushBro;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		23FB07A72FDB32FB000943D2 /* PushBro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PushBro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		23FB07C12FDB32FB000943D2 /* PushBroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PushBroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		23FB07A92FDB32FB000943D2 /* PushBro */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PushBro;
+			sourceTree = "<group>";
+		};
+		23FB07C22FDB32FB000943D2 /* PushBroTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PushBroTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		23FB07A42FDB32FB000943D2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		23FB07C52FDB32FB000943D2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		23FB079E2FDB32FB000943D2 = {
+			isa = PBXGroup;
+			children = (
+				23FB07A92FDB32FB000943D2 /* PushBro */,
+				23FB07C22FDB32FB000943D2 /* PushBroTests */,
+				23FB07A82FDB32FB000943D2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		23FB07A82FDB32FB000943D2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				23FB07A72FDB32FB000943D2 /* PushBro.app */,
+				23FB07C12FDB32FB000943D2 /* PushBroTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		23FB07A62FDB32FB000943D2 /* PushBro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23FB07B42FDB32FC000943D2 /* Build configuration list for PBXNativeTarget "PushBro" */;
+			buildPhases = (
+				23FB07A32FDB32FB000943D2 /* Sources */,
+				23FB07A42FDB32FB000943D2 /* Frameworks */,
+				23FB07A52FDB32FB000943D2 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				23FB07A92FDB32FB000943D2 /* PushBro */,
+			);
+			name = PushBro;
+			productName = PushBro;
+			productReference = 23FB07A72FDB32FB000943D2 /* PushBro.app */;
+			productType = "com.apple.product-type.application";
+		};
+		23FB07C32FDB32FB000943D2 /* PushBroTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23FB07CB2FDB32FB000943D2 /* Build configuration list for PBXNativeTarget "PushBroTests" */;
+			buildPhases = (
+				23FB07C42FDB32FB000943D2 /* Sources */,
+				23FB07C52FDB32FB000943D2 /* Frameworks */,
+				23FB07C62FDB32FB000943D2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				23FB07C72FDB32FB000943D2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				23FB07C22FDB32FB000943D2 /* PushBroTests */,
+			);
+			name = PushBroTests;
+			productName = PushBroTests;
+			productReference = 23FB07C12FDB32FB000943D2 /* PushBroTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		23FB079F2FDB32FB000943D2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					23FB07A62FDB32FB000943D2 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					23FB07C32FDB32FB000943D2 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 23FB07A62FDB32FB000943D2;
+					};
+				};
+			};
+			buildConfigurationList = 23FB07A22FDB32FB000943D2 /* Build configuration list for PBXProject "PushBro" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 23FB079E2FDB32FB000943D2;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 23FB07A82FDB32FB000943D2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				23FB07A62FDB32FB000943D2 /* PushBro */,
+				23FB07C32FDB32FB000943D2 /* PushBroTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		23FB07A52FDB32FB000943D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		23FB07C62FDB32FB000943D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		23FB07A32FDB32FB000943D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		23FB07C42FDB32FB000943D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		23FB07C72FDB32FB000943D2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 23FB07A62FDB32FB000943D2 /* PushBro */;
+			targetProxy = 23FB08DC2FDB3CD2000943D2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		23FB07B22FDB32FC000943D2 /* Debug configuration for PBXProject "PushBro" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		23FB07B32FDB32FC000943D2 /* Release configuration for PBXProject "PushBro" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		23FB07B52FDB32FC000943D2 /* Debug configuration for PBXNativeTarget "PushBro" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PushBro/Support/PushBro.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "PushBro uses the front camera to measure your distance from the phone and count pushups.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "PushBro reads workouts to avoid saving duplicates.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "PushBro saves your pushup sessions as workouts in Apple Health.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "PushBro listens for 'start' and 'stop' so you can control workouts hands-free.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition runs on-device to detect your voice commands.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.greenSphereStudios.PushBro;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		23FB07B62FDB32FC000943D2 /* Release configuration for PBXNativeTarget "PushBro" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PushBro/Support/PushBro.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "PushBro uses the front camera to measure your distance from the phone and count pushups.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "PushBro reads workouts to avoid saving duplicates.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "PushBro saves your pushup sessions as workouts in Apple Health.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "PushBro listens for 'start' and 'stop' so you can control workouts hands-free.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition runs on-device to detect your voice commands.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.greenSphereStudios.PushBro;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		23FB07C92FDB32FB000943D2 /* Debug configuration for PBXNativeTarget "PushBroTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.greenSphereStudios.PushBroTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PushBro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PushBro";
+			};
+			name = Debug;
+		};
+		23FB07CA2FDB32FB000943D2 /* Release configuration for PBXNativeTarget "PushBroTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DL6N525G5K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.greenSphereStudios.PushBroTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PushBro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PushBro";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		23FB07A22FDB32FB000943D2 /* Build configuration list for PBXProject "PushBro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23FB07B22FDB32FC000943D2 /* Debug configuration for PBXProject "PushBro" */,
+				23FB07B32FDB32FC000943D2 /* Release configuration for PBXProject "PushBro" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		23FB07B42FDB32FC000943D2 /* Build configuration list for PBXNativeTarget "PushBro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23FB07B52FDB32FC000943D2 /* Debug configuration for PBXNativeTarget "PushBro" */,
+				23FB07B62FDB32FC000943D2 /* Release configuration for PBXNativeTarget "PushBro" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		23FB07CB2FDB32FB000943D2 /* Build configuration list for PBXNativeTarget "PushBroTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23FB07C92FDB32FB000943D2 /* Debug configuration for PBXNativeTarget "PushBroTests" */,
+				23FB07CA2FDB32FB000943D2 /* Release configuration for PBXNativeTarget "PushBroTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 23FB079F2FDB32FB000943D2 /* Project object */;
+	validationLevel = 1;
+}
