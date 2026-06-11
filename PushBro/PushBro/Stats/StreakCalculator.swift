@@ -19,10 +19,26 @@ enum StreakCalculator {
         today: Date = .now,
         calendar: Calendar = .current
     ) -> Streaks {
-        guard goal > 0, !dailyTotals.isEmpty else { return Streaks() }
+        streaks(dailyTotals: dailyTotals, goalProvider: { _ in goal }, today: today, calendar: calendar)
+    }
+
+    /// Per-day goal variant: each day is judged against the goal that was in
+    /// effect on that day.
+    static func streaks(
+        dailyTotals: [Date: Int],
+        goalProvider: (Date) -> Int,
+        today: Date = .now,
+        calendar: Calendar = .current
+    ) -> Streaks {
+        guard !dailyTotals.isEmpty else { return Streaks() }
 
         let metDays = Set(
-            dailyTotals.filter { $0.value >= goal }.keys.map { calendar.startOfDay(for: $0) }
+            dailyTotals
+                .filter { day, total in
+                    let goal = goalProvider(day)
+                    return goal > 0 && total >= goal
+                }
+                .keys.map { calendar.startOfDay(for: $0) }
         )
         guard !metDays.isEmpty else { return Streaks() }
 

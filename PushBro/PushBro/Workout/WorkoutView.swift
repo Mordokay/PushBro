@@ -65,7 +65,10 @@ struct WorkoutView: View {
                 refreshVoiceListening()
             }
             .navigationTitle("PushBro")
-            .toolbarVisibility(engine?.phase == .active ? .hidden : .visible, for: .navigationBar)
+            .toolbarVisibility(
+                engine?.phase == .active || engine?.phase == .summary ? .hidden : .visible,
+                for: .navigationBar
+            )
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("How it works", systemImage: "questionmark.circle") {

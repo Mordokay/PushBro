@@ -6,24 +6,42 @@
 import SwiftData
 import SwiftUI
 
+enum AppTab: String {
+    case workout
+    case history
+    case stats
+    case settings
+}
+
 struct RootTabView: View {
     @AppStorage(AppSettings.hasSeenTutorialKey) private var hasSeenTutorial = false
     @AppStorage(AppSettings.hasCompletedOnboardingKey) private var hasCompletedOnboarding = false
     @State private var showOnboarding = false
     @State private var showTutorial = false
+    @State private var selectedTab: AppTab = {
+        #if DEBUG
+        // UI-test/automation hook: launch with "-openTab stats" etc.
+        if let index = ProcessInfo.processInfo.arguments.firstIndex(of: "-openTab"),
+           index + 1 < ProcessInfo.processInfo.arguments.count,
+           let tab = AppTab(rawValue: ProcessInfo.processInfo.arguments[index + 1]) {
+            return tab
+        }
+        #endif
+        return .workout
+    }()
 
     var body: some View {
-        TabView {
-            Tab("Workout", systemImage: "figure.strengthtraining.traditional") {
+        TabView(selection: $selectedTab) {
+            Tab("Workout", systemImage: "figure.strengthtraining.traditional", value: .workout) {
                 WorkoutView()
             }
-            Tab("History", systemImage: "calendar") {
+            Tab("History", systemImage: "calendar", value: .history) {
                 HistoryView()
             }
-            Tab("Stats", systemImage: "chart.bar.fill") {
+            Tab("Stats", systemImage: "chart.bar.fill", value: .stats) {
                 StatsView()
             }
-            Tab("Settings", systemImage: "gearshape.fill") {
+            Tab("Settings", systemImage: "gearshape.fill", value: .settings) {
                 SettingsView()
             }
         }

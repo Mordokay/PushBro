@@ -128,6 +128,9 @@ struct SettingsView: View {
                                 .monospacedDigit()
                         }
                     }
+                    .onChange(of: dailyGoal) { old, new in
+                        GoalHistoryStore.recordChange(from: old, to: new)
+                    }
                 }
 
                 Section {

@@ -11,7 +11,8 @@ struct CalendarHeatmapView: View {
     let month: Date
     /// Reps per start-of-day.
     let dailyTotals: [Date: Int]
-    let goal: Int
+    /// The goal in effect for a given day.
+    let goalFor: (Date) -> Int
     @Binding var selectedDay: Date?
 
     private var calendar: Calendar { .current }
@@ -59,7 +60,7 @@ struct CalendarHeatmapView: View {
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 40)
-            .background(cellColor(total: total), in: RoundedRectangle(cornerRadius: 8))
+            .background(cellColor(total: total, goal: goalFor(day)), in: RoundedRectangle(cornerRadius: 8))
             .overlay {
                 RoundedRectangle(cornerRadius: 8)
                     .strokeBorder(isSelected ? Color.accentColor : .clear, lineWidth: 2)
@@ -70,7 +71,7 @@ struct CalendarHeatmapView: View {
         .disabled(isFuture)
     }
 
-    private func cellColor(total: Int) -> Color {
+    private func cellColor(total: Int, goal: Int) -> Color {
         guard total > 0, goal > 0 else { return Color(.tertiarySystemFill) }
         let fraction = min(1.0, Double(total) / Double(goal))
         return Color.accentColor.opacity(0.25 + 0.75 * fraction)
@@ -108,7 +109,7 @@ struct CalendarHeatmapView: View {
             Calendar.current.date(byAdding: .day, value: -1, to: today)!: 30,
             Calendar.current.date(byAdding: .day, value: -3, to: today)!: 80,
         ],
-        goal: 50,
+        goalFor: { _ in 50 },
         selectedDay: $selected
     )
     .padding()

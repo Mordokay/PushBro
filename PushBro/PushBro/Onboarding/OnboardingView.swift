@@ -137,6 +137,10 @@ struct OnboardingView: View {
             title: "Pick a daily goal",
             text: "Your streak, calendar, and charts all measure against this."
         ) {
+            EmptyView()
+                .onChange(of: dailyGoal) { old, new in
+                    GoalHistoryStore.recordChange(from: old, to: new)
+                }
             VStack(spacing: 10) {
                 ForEach(FitnessLevel.allCases) { level in
                     Button {

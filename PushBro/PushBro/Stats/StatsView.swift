@@ -95,14 +95,26 @@ struct StatsView: View {
 
     // MARK: - Month progress
 
+    /// When the user started using the app: the recorded first launch, or
+    /// the earliest session if that's older (covers pre-tracking installs).
+    /// Month charts ignore days before this entirely.
+    private var appStartDate: Date {
+        let stored = UserDefaults.standard.double(forKey: AppSettings.firstLaunchDateKey)
+        let firstLaunch = stored > 0 ? Date(timeIntervalSince1970: stored) : .now
+        let firstSession = sessions.map(\.startDate).min() ?? firstLaunch
+        return min(firstLaunch, firstSession)
+    }
+
     private var monthProgressCard: some View {
         let calendar = Calendar.current
-        let points = StatsCalculator.cumulativeMonthProgress(sessions)
-        let monthStart = calendar.dateInterval(of: .month, for: .now)?.start ?? .now
-        let daysInMonth = calendar.range(of: .day, in: .month, for: .now)?.count ?? 30
-        let monthEnd = calendar.date(byAdding: .day, value: daysInMonth - 1, to: monthStart) ?? .now
+        let history = GoalHistoryStore.load()
+        let start = appStartDate
+        let points = StatsCalculator.cumulativeMonthProgress(sessions, startDate: start)
+        let pace = StatsCalculator.cumulativeGoalPace(history: history, fallbackGoal: dailyGoal, startDate: start)
         let currentTotal = points.last?.total ?? 0
-        let paceTarget = dailyGoal * calendar.component(.day, from: .now)
+        let today = calendar.startOfDay(for: .now)
+        let paceTarget = pace.first { calendar.isDate($0.day, inSameDayAs: today) }?.total
+            ?? pace.last?.total ?? 0
         let onPace = currentTotal >= paceTarget
 
         return chartCard(
@@ -125,20 +137,17 @@ struct StatsView: View {
                     .foregroundStyle(.green)
                     .lineStyle(StrokeStyle(lineWidth: 2.5))
                 }
-                LineMark(
-                    x: .value("Day", monthStart, unit: .day),
-                    y: .value("Reps", dailyGoal),
-                    series: .value("Series", "Goal pace")
-                )
-                .foregroundStyle(.orange)
-                .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
-                LineMark(
-                    x: .value("Day", monthEnd, unit: .day),
-                    y: .value("Reps", dailyGoal * daysInMonth),
-                    series: .value("Series", "Goal pace")
-                )
-                .foregroundStyle(.orange)
-                .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+                // Pace honors the goal in effect each day, so the slope
+                // bends where the goal changed.
+                ForEach(pace) { point in
+                    LineMark(
+                        x: .value("Day", point.day, unit: .day),
+                        y: .value("Reps", point.total),
+                        series: .value("Series", "Goal pace")
+                    )
+                    .foregroundStyle(.orange)
+                    .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+                }
             }
         }
     }
@@ -192,29 +201,59 @@ struct StatsView: View {
 
     // MARK: - Volume
 
+    /// The goal in effect for a chart period — the day's recorded goal, or
+    /// the sum of the week's daily goals when aggregating weekly.
+    private func goal(for period: Date, history: GoalHistory) -> Int {
+        let calendar = Calendar.current
+        guard range.groupsByWeek else {
+            return history.goal(on: period, fallback: dailyGoal)
+        }
+        return (0..<7).reduce(0) { sum, offset in
+            guard let day = calendar.date(byAdding: .day, value: offset, to: period) else { return sum }
+            return sum + history.goal(on: day, fallback: dailyGoal)
+        }
+    }
+
     private func volumeCard(_ stats: [StatsCalculator.PeriodStats]) -> some View {
-        let goal = dailyGoal * (range.groupsByWeek ? 7 : 1)
+        let history = GoalHistoryStore.load()
+        let currentGoal = dailyGoal * (range.groupsByWeek ? 7 : 1)
         return chartCard(
             title: "Volume",
             icon: "chart.bar.fill",
-            caption: range.groupsByWeek
-                ? "Pushups per week. Green weeks hit 7× your daily goal."
-                : "Pushups per day. Green days hit your goal of \(dailyGoal)."
+            caption: "Blue is reps toward that \(range.groupsByWeek ? "week" : "day")'s goal, green is extra, faded red is what was missed."
         ) {
             Chart {
+                // No if/else in chart content: conditional ChartContent hits
+                // a Charts runtime metadata crash. Zero-height marks render
+                // nothing, so both segments are emitted unconditionally.
                 ForEach(stats) { stat in
+                    let goal = goal(for: stat.period, history: history)
+                    let achieved = min(stat.reps, goal)
+                    let extra = max(0, stat.reps - goal)
+                    let missed = max(0, goal - stat.reps)
                     BarMark(
                         x: .value("Date", stat.period, unit: range.chartUnit),
-                        y: .value("Reps", stat.reps)
+                        y: .value("Reps", achieved)
                     )
-                    .foregroundStyle(stat.reps >= goal ? Color.green : Color.accentColor)
-                    .cornerRadius(4)
+                    .foregroundStyle(Color.accentColor)
+                    .cornerRadius(2)
+                    .annotation(position: .overlay) {
+                        Text(stat.reps > 0 ? "\(stat.reps)" : "")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(.white)
+                    }
+                    BarMark(
+                        x: .value("Date", stat.period, unit: range.chartUnit),
+                        y: .value("Reps", extra + missed)
+                    )
+                    .foregroundStyle(extra > 0 ? Color.green : Color.red.opacity(0.22))
+                    .cornerRadius(2)
                 }
-                RuleMark(y: .value("Goal", goal))
+                RuleMark(y: .value("Goal", currentGoal))
                     .foregroundStyle(.orange)
                     .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
                     .annotation(position: .topTrailing) {
-                        Text("Goal \(goal)")
+                        Text("Goal \(currentGoal)")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.orange)
                     }
@@ -311,7 +350,11 @@ struct StatsView: View {
 
     private var allTimeGrid: some View {
         let summary = StatsCalculator.summarize(sessions)
-        let streaks = StreakCalculator.streaks(dailyTotals: StatsCalculator.dailyTotals(sessions), goal: dailyGoal)
+        let history = GoalHistoryStore.load()
+        let streaks = StreakCalculator.streaks(
+            dailyTotals: StatsCalculator.dailyTotals(sessions),
+            goalProvider: { history.goal(on: $0, fallback: dailyGoal) }
+        )
 
         return VStack(alignment: .leading, spacing: 12) {
             Text("All time")

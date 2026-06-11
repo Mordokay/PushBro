@@ -28,6 +28,11 @@ enum AppSettings {
     /// 0 = not provided. Improves calorie estimates (Mifflin-St Jeor).
     static let userHeightCmKey = "userHeightCm"
     static let watchHeartRateEnabledKey = "watchHeartRateEnabled"
+    /// GoalHistory JSON — per-day goal tracking for charts and streaks.
+    static let goalHistoryJSONKey = "goalHistoryJSON"
+    /// Epoch seconds of the first app launch; 0 = unset. Combined with the
+    /// earliest session date to know when the user started using the app.
+    static let firstLaunchDateKey = "firstLaunchDate"
 
     static let defaultDailyGoal = 50
     static let defaultRestThreshold = 4.0

@@ -197,6 +197,130 @@ struct StatsTests {
         #expect(slices.first { $0.name == targetSymbol }?.reps == 5)
     }
 
+    @Test func goalHistoryTracksPerDayGoals() {
+        var history = GoalHistory()
+        // Empty history falls back.
+        #expect(history.goal(on: day(0), fallback: 50) == 50)
+
+        history.record(goal: 100, at: .distantPast)
+        history.record(goal: 110, at: day(0).addingTimeInterval(10 * 3600)) // changed mid-today
+
+        #expect(history.goal(on: day(-1), fallback: 50) == 100)
+        #expect(history.goal(on: day(0), fallback: 50) == 110)
+        #expect(history.goal(on: day(5), fallback: 50) == 110)
+        // Days before the first change use the first known goal.
+        #expect(history.goal(on: day(-400), fallback: 50) == 100)
+    }
+
+    @Test func goalHistoryCollapsesSameDayChanges() {
+        var history = GoalHistory()
+        let noon = day(0).addingTimeInterval(12 * 3600)
+        history.record(goal: 100, at: .distantPast)
+        history.record(goal: 105, at: noon)
+        history.record(goal: 110, at: noon.addingTimeInterval(60))
+        history.record(goal: 120, at: noon.addingTimeInterval(120))
+        // Stepper fiddling collapses to the final value of the day.
+        #expect(history.changes.count == 2)
+        #expect(history.goal(on: day(0), fallback: 0) == 120)
+        #expect(history.goal(on: day(-1), fallback: 0) == 100)
+
+        // Reverting to the previous value the same day removes the change.
+        history.record(goal: 100, at: noon.addingTimeInterval(180))
+        #expect(history.changes.count == 1)
+
+        // JSON round trip.
+        let decoded = GoalHistory.decode(fromJSON: history.encodedJSON())
+        #expect(decoded == history)
+    }
+
+    @Test func streaksUsePerDayGoals() {
+        // 100 every day until yesterday; 110 from today.
+        var history = GoalHistory()
+        history.record(goal: 100, at: .distantPast)
+        history.record(goal: 110, at: day(0))
+
+        let totals: [Date: Int] = [
+            day(-2): 100, // met under old goal
+            day(-1): 105, // met under old goal, would fail under 110
+            day(0): 110,  // met under new goal
+        ]
+        let streaks = StreakCalculator.streaks(
+            dailyTotals: totals,
+            goalProvider: { history.goal(on: $0, fallback: 0) },
+            today: day(0)
+        )
+        #expect(streaks.current == 3)
+        #expect(streaks.best == 3)
+
+        // A flat 110 goal would have broken the streak at day(-1).
+        let flat = StreakCalculator.streaks(dailyTotals: totals, goal: 110, today: day(0))
+        #expect(flat.current == 1)
+    }
+
+    @Test func goalPaceBendsAtGoalChanges() {
+        let today = day(0)
+        guard let monthStart = calendar.dateInterval(of: .month, for: today)?.start,
+              let daysInMonth = calendar.range(of: .day, in: .month, for: today)?.count else {
+            Issue.record("no month info")
+            return
+        }
+        var history = GoalHistory()
+        history.record(goal: 100, at: .distantPast)
+        history.record(goal: 10, at: today) // experiment: dropped mid-month
+
+        let pace = StatsCalculator.cumulativeGoalPace(history: history, fallbackGoal: 50, today: today)
+        #expect(pace.count == daysInMonth)
+        // Day 1 climbs at the old goal.
+        #expect(pace.first?.total == 100)
+        let dayOfMonth = calendar.component(.day, from: today)
+        // Days before the change accumulate 100/day; today adds only 10.
+        let expectedToday = (dayOfMonth - 1) * 100 + 10
+        #expect(pace[dayOfMonth - 1].total == expectedToday)
+        // Remaining days extend at the new goal.
+        #expect(pace.last?.total == expectedToday + (daysInMonth - dayOfMonth) * 10)
+        // Monotonically increasing.
+        #expect(zip(pace, pace.dropFirst()).allSatisfy { $0.total < $1.total })
+
+        // Empty history: flat fallback pace.
+        let flat = StatsCalculator.cumulativeGoalPace(history: GoalHistory(), fallbackGoal: 50, today: today)
+        #expect(flat.first?.total == 50)
+        #expect(flat.last?.total == 50 * daysInMonth)
+    }
+
+    @Test func monthSeriesClipToAppStartDate() {
+        let today = day(0)
+        guard let monthStart = calendar.dateInterval(of: .month, for: today)?.start,
+              let daysInMonth = calendar.range(of: .day, in: .month, for: today)?.count else {
+            Issue.record("no month info")
+            return
+        }
+        let dayOfMonth = calendar.component(.day, from: today)
+        // Started using the app "yesterday" (or today if the month just began).
+        let start = calendar.date(byAdding: .day, value: dayOfMonth > 1 ? -1 : 0, to: today)!
+        let clippedDays = dayOfMonth > 1 ? 2 : 1
+
+        let pace = StatsCalculator.cumulativeGoalPace(
+            history: GoalHistory(), fallbackGoal: 50, startDate: start, today: today
+        )
+        // Pace exists only from the start day through month end.
+        let startDayOfMonth = calendar.component(.day, from: start)
+        #expect(pace.count == daysInMonth - startDayOfMonth + 1)
+        #expect(pace.first?.day == calendar.startOfDay(for: start))
+        #expect(pace.first?.total == 50) // no debt for skipped days
+
+        let sessions = [session(on: start, sets: [[0, 1, 2]])]
+        let progress = StatsCalculator.cumulativeMonthProgress(sessions, startDate: start, today: today)
+        #expect(progress.count == clippedDays)
+        #expect(progress.first?.day == calendar.startOfDay(for: start))
+        #expect(progress.last?.total == 3)
+
+        // Start date before the month: no clipping.
+        let unclipped = StatsCalculator.cumulativeGoalPace(
+            history: GoalHistory(), fallbackGoal: 50, startDate: monthStart.addingTimeInterval(-86400 * 40), today: today
+        )
+        #expect(unclipped.count == daysInMonth)
+    }
+
     @Test func emptyOrZeroGoalIsSafe() {
         #expect(StreakCalculator.streaks(dailyTotals: [:], goal: 50) == StreakCalculator.Streaks())
         #expect(StreakCalculator.streaks(dailyTotals: [day(0): 100], goal: 0) == StreakCalculator.Streaks())

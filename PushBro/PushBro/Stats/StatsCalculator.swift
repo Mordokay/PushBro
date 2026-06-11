@@ -155,8 +155,11 @@ enum StatsCalculator {
 
     /// Running rep total for each day of the current calendar month, up to
     /// (and including) today. Days without workouts carry the total forward.
+    /// `startDate` clips the series — days before the user started using the
+    /// app don't appear at all.
     static func cumulativeMonthProgress(
         _ sessions: [WorkoutSession],
+        startDate: Date? = nil,
         today: Date = .now,
         calendar: Calendar = .current
     ) -> [CumulativePoint] {
@@ -166,9 +169,39 @@ enum StatsCalculator {
         var points: [CumulativePoint] = []
         var running = 0
         var day = month.start
+        if let startDate {
+            day = max(day, calendar.startOfDay(for: startDate))
+        }
         let endOfToday = calendar.startOfDay(for: today)
         while day <= endOfToday {
             running += totals[day] ?? 0
+            points.append(CumulativePoint(day: day, total: running))
+            guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+            day = next
+        }
+        return points
+    }
+
+    /// Cumulative goal pace for the current calendar month, honoring the
+    /// goal in effect on each day — the line's slope changes where the goal
+    /// changed, and future days extend at the latest goal. `startDate` clips
+    /// the series so no pace is demanded for days before the app was used.
+    static func cumulativeGoalPace(
+        history: GoalHistory,
+        fallbackGoal: Int,
+        startDate: Date? = nil,
+        today: Date = .now,
+        calendar: Calendar = .current
+    ) -> [CumulativePoint] {
+        guard let month = calendar.dateInterval(of: .month, for: today) else { return [] }
+        var points: [CumulativePoint] = []
+        var running = 0
+        var day = month.start
+        if let startDate {
+            day = max(day, calendar.startOfDay(for: startDate))
+        }
+        while day < month.end {
+            running += history.goal(on: day, calendar: calendar, fallback: fallbackGoal)
             points.append(CumulativePoint(day: day, total: running))
             guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
             day = next

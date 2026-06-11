@@ -40,6 +40,8 @@ DEVELOPER_DIR=/Applications/Xcode-beta.app xcodebuild \
 - The speaker and mic are centimeters apart on the floor: voice recognition must stay gated on `SpeechAnnouncer.isSpeaking` (+ echo tail) or TTS triggers commands.
 - TrueDepth loses the face below ~15–20 cm; the FSM's "face lost while deep counts as bottom" rule depends on `deepFaceLossFraction` — don't remove it.
 - `AVAudioSession` needs `.defaultToSpeaker` or TTS routes to the earpiece (inaudible from plank position).
+- **Never use `if`/`else` inside a Swift Charts `Chart { }` content builder** — `_ConditionalContent<opaque ChartContent>` hits a runtime witness-table SIGSEGV the moment the chart lays out. Emit marks unconditionally with zero-height values (they render nothing) and ternaries in modifiers instead. Conditional *views* (e.g. inside `.annotation { }`) are fine.
+- Debug launch hooks for Simulator automation (no tap access): `-seedData` populates demo workouts, `-openTab workout|history|stats|settings` selects the initial tab.
 
 ## Simulator workflow
 

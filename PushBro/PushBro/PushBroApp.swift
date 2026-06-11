@@ -25,6 +25,17 @@ struct PushBroApp: App {
         }
     }()
 
+    init() {
+        if UserDefaults.standard.double(forKey: AppSettings.firstLaunchDateKey) == 0 {
+            UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: AppSettings.firstLaunchDateKey)
+        }
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-seedData") {
+            DebugSeed.populate(context: sharedModelContainer.mainContext)
+        }
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             RootTabView()

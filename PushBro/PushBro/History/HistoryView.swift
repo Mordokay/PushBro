@@ -32,10 +32,11 @@ struct HistoryView: View {
                 } else {
                     VStack(spacing: 0) {
                         monthHeader
+                        let goalHistory = GoalHistoryStore.load()
                         CalendarHeatmapView(
                             month: displayedMonth,
                             dailyTotals: dailyTotals,
-                            goal: dailyGoal,
+                            goalFor: { goalHistory.goal(on: $0, fallback: dailyGoal) },
                             selectedDay: $selectedDay
                         )
                         .padding(.horizontal)

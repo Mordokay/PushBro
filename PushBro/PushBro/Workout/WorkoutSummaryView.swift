@@ -17,10 +17,11 @@ struct WorkoutSummaryView: View {
                     .font(.system(size: 96, weight: .black, design: .rounded))
                     .monospacedDigit()
                 Text("pushups")
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 24, weight: .semibold))
                     .foregroundStyle(.secondary)
             }
             .padding(.top, 32)
+            .padding(.bottom, 10)
 
             List {
                 Section {
